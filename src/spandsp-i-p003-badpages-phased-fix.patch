@@ -1,0 +1,30 @@
+diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-0.0.6/src/t30.c spandsp-0.0.6/src/t30.c
+--- spandsp-base-0.0.6/src/t30.c	2014-04-02 15:07:05.028060357 +0100
++++ spandsp-0.0.6/src/t30.c	2014-04-03 11:10:52.435820311 +0100
+@@ -3197,8 +3197,6 @@
+             send_simple_frame(s, T30_RTP);
+             break;
+         case T30_COPY_QUALITY_BAD:
+-            if (s->phase_d_handler)
+-                s->phase_d_handler(s, s->phase_d_user_data, fcf);
+             rx_start_page(s);
+             set_state(s, T30_STATE_III_Q_RTN);
+             send_simple_frame(s, T30_RTN);
+@@ -3235,8 +3233,6 @@
+             send_simple_frame(s, T30_RTP);
+             break;
+         case T30_COPY_QUALITY_BAD:
+-            if (s->phase_d_handler)
+-                s->phase_d_handler(s, s->phase_d_user_data, fcf);
+             rx_start_page(s);
+             set_state(s, T30_STATE_III_Q_RTN);
+             send_simple_frame(s, T30_RTN);
+@@ -3271,8 +3267,6 @@
+             send_simple_frame(s, T30_RTP);
+             break;
+         case T30_COPY_QUALITY_BAD:
+-            if (s->phase_d_handler)
+-                s->phase_d_handler(s, s->phase_d_user_data, fcf);
+             set_state(s, T30_STATE_III_Q_RTN);
+             send_simple_frame(s, T30_RTN);
+             break;
