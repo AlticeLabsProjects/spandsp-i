@@ -1,6 +1,6 @@
-diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-0.0.6/src/spandsp/t30.h spandsp-0.0.6/src/spandsp/t30.h
---- spandsp-base-0.0.6/src/spandsp/t30.h	2010-08-09 15:12:29.000000000 +0100
-+++ spandsp-0.0.6/src/spandsp/t30.h	2013-11-01 16:02:53.391710137 +0000
+diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/spandsp/t30.h spandsp-fs/src/spandsp/t30.h
+--- spandsp-base-fs/src/spandsp/t30.h	2014-04-22 15:13:32.625037746 +0100
++++ spandsp-fs/src/spandsp/t30.h	2014-04-22 15:15:20.636777041 +0100
 @@ -143,7 +143,9 @@
  /*! The maximum length of the body of an ident string */
  #define T30_MAX_IDENT_LEN           20
@@ -12,21 +12,13 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
  
  typedef struct t30_state_s t30_state_t;
  
-diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-0.0.6/src/t4_tx.c spandsp-0.0.6/src/t4_tx.c
---- spandsp-base-0.0.6/src/t4_tx.c	2010-07-24 17:28:35.000000000 +0100
-+++ spandsp-0.0.6/src/t4_tx.c	2013-11-01 16:38:35.075637154 +0000
-@@ -82,6 +82,7 @@
- #include "spandsp/timezone.h"
- #include "spandsp/t4_rx.h"
- #include "spandsp/t4_tx.h"
-+#include "spandsp/t30.h"
- #if defined(SPANDSP_SUPPORT_T85)
- #include "spandsp/t81_t82_arith_coding.h"
- #include "spandsp/t85.h"
-@@ -398,6 +399,42 @@
-              s->current_page + 1);
+diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/t4_tx.c spandsp-fs/src/t4_tx.c
+--- spandsp-base-fs/src/t4_tx.c	2014-04-22 15:13:32.965277368 +0100
++++ spandsp-fs/src/t4_tx.c	2014-04-22 15:14:41.608777086 +0100
+@@ -1425,6 +1425,39 @@
  }
  /*- End of function --------------------------------------------------------*/
+ 
 +static char *replace_str(char *str, const char *sub, char *rep)
 +{
 +    char buffer[T30_MAX_PAGE_HEADER_INFO + 1];
@@ -37,7 +29,7 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
 +        return str;
 +    }
 +
-+    strncpy(buffer, str, p - str); // copy chars 
++    strncpy(buffer, str, p - str); // copy chars
 +    buffer[p - str] = '\0';
 +
 +    snprintf(buffer + (p - str),T30_MAX_PAGE_HEADER_INFO,"%s%s", rep, p + strlen(sub));
@@ -46,40 +38,46 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
 +    return str;
 +}
 +
-+static void make_header_full(t4_state_t *s, char *header)
++static void make_header_full(t4_state_t *s)
 +{
 +    const char *sub_page = "%P";
 +    const char *sub_far_ident = "%R";
 +    char tmp[20];
 +
-+    strncpy(header,s->header_info,T30_MAX_PAGE_HEADER_INFO);  
-+    header[T30_MAX_PAGE_HEADER_INFO] = '\0';
-+    
 +    snprintf(tmp,sizeof(tmp),"%d",s->current_page+1);
-+    header = replace_str(header,sub_page,tmp);
++    header = replace_str(s->header_info,sub_page,tmp);
 +
 +    snprintf(tmp,sizeof(tmp),"%s",(s->tiff.far_ident)  ?  s->tiff.far_ident  :  "");
-+    header = replace_str(header,sub_far_ident,tmp);
-+
++    header = replace_str(s->header_info,sub_far_ident,tmp);
 +}
 +/*- End of function --------------------------------------------------------*/
- 
- static int t4_tx_put_fax_header(t4_state_t *s)
++
+ static int make_header(t4_tx_state_t *s)
  {
-@@ -407,10 +444,14 @@
-     int pattern;
-     int row_bufptr;
-     char *t;
--    char header[132 + 1];
-+    char header[T30_MAX_PAGE_HEADER_INFO + 1];
+     time_t now;
+@@ -2439,6 +2472,8 @@
  
-     /* Modify the resulting image to include a header line, typical of hardware FAX machines */
--    make_header(s, header);
-+    
+ SPAN_DECLARE(int) t4_tx_start_page(t4_tx_state_t *s)
+ {
++    int result = 0;
++
+     span_log(&s->logging, SPAN_LOG_FLOW, "Start tx page %d - compression %s\n", s->current_page, t4_compression_to_str(s->metadata.compression));
+     if (s->current_page > s->stop_page)
+         return -1;
+@@ -2494,9 +2529,15 @@
+         break;
+     }
+ 
 +    if (strlen(s->header_info) < T30_MAX_SMALL_PAGE_HEADER_INFO)
-+       make_header(s, header);
++        result = make_header(s);
 +    else
-+       make_header_full(s, header);
-     switch (s->y_resolution)
++        result = make_header_full(s);
++
++
+     /* If there is a page header, create that first */
+     //if (s->metadata.image_type == T4_IMAGE_TYPE_BILEVEL  &&  s->header_info  &&  s->header_info[0]  &&  make_header(s) == 0)
+-    if (s->header_info  &&  s->header_info[0]  &&  make_header(s) == 0)
++    if (s->header_info  &&  s->header_info[0]  &&  result == 0)
      {
-     case T4_Y_RESOLUTION_1200:
+         s->header_row = 0;
+         set_row_read_handler(s, header_row_read_handler, (void *) s);
