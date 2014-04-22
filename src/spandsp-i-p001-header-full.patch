@@ -14,7 +14,7 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
  
 diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/t4_tx.c spandsp-fs/src/t4_tx.c
 --- spandsp-base-fs/src/t4_tx.c	2014-04-22 17:25:21.913277458 +0100
-+++ spandsp-fs/src/t4_tx.c	2014-04-22 17:27:13.172777368 +0100
++++ spandsp-fs/src/t4_tx.c	2014-04-22 18:01:10.217277423 +0100
 @@ -67,6 +67,7 @@
  #include "spandsp/t43.h"
  #include "spandsp/t4_t6_decode.h"
@@ -56,7 +56,7 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
 +    s->header_info = replace_str(s->header_info,sub_page,tmp);
 +
 +    snprintf(tmp,sizeof(tmp),"%s",(s->local_ident)  ?  s->local_ident  :  "");
-+    s->header = replace_str(s->header_info,sub_far_ident,tmp);
++    s->header_info = replace_str(s->header_info,sub_far_ident,tmp);
 +
 +    return 0;
 +}
