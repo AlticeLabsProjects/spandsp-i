@@ -1,6 +1,6 @@
 diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/spandsp/t30.h spandsp-fs/src/spandsp/t30.h
---- spandsp-base-fs/src/spandsp/t30.h	2014-04-22 15:13:32.625037746 +0100
-+++ spandsp-fs/src/spandsp/t30.h	2014-04-22 15:15:20.636777041 +0100
+--- spandsp-base-fs/src/spandsp/t30.h	2014-04-22 17:25:21.608777532 +0100
++++ spandsp-fs/src/spandsp/t30.h	2014-04-22 17:25:52.868777031 +0100
 @@ -143,7 +143,9 @@
  /*! The maximum length of the body of an ident string */
  #define T30_MAX_IDENT_LEN           20
@@ -13,9 +13,17 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
  typedef struct t30_state_s t30_state_t;
  
 diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/t4_tx.c spandsp-fs/src/t4_tx.c
---- spandsp-base-fs/src/t4_tx.c	2014-04-22 15:13:32.965277368 +0100
-+++ spandsp-fs/src/t4_tx.c	2014-04-22 15:14:41.608777086 +0100
-@@ -1425,6 +1425,39 @@
+--- spandsp-base-fs/src/t4_tx.c	2014-04-22 17:25:21.913277458 +0100
++++ spandsp-fs/src/t4_tx.c	2014-04-22 17:27:13.172777368 +0100
+@@ -67,6 +67,7 @@
+ #include "spandsp/t43.h"
+ #include "spandsp/t4_t6_decode.h"
+ #include "spandsp/t4_t6_encode.h"
++#include "spandsp/t30.h"
+ 
+ #include "spandsp/private/logging.h"
+ #include "spandsp/private/t81_t82_arith_coding.h"
+@@ -1425,6 +1426,41 @@
  }
  /*- End of function --------------------------------------------------------*/
  
@@ -38,24 +46,26 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
 +    return str;
 +}
 +
-+static void make_header_full(t4_state_t *s)
++static int make_header_full(t4_tx_state_t *s)
 +{
 +    const char *sub_page = "%P";
 +    const char *sub_far_ident = "%R";
 +    char tmp[20];
 +
 +    snprintf(tmp,sizeof(tmp),"%d",s->current_page+1);
-+    header = replace_str(s->header_info,sub_page,tmp);
++    s->header_info = replace_str(s->header_info,sub_page,tmp);
 +
-+    snprintf(tmp,sizeof(tmp),"%s",(s->tiff.far_ident)  ?  s->tiff.far_ident  :  "");
-+    header = replace_str(s->header_info,sub_far_ident,tmp);
++    snprintf(tmp,sizeof(tmp),"%s",(s->local_ident)  ?  s->local_ident  :  "");
++    s->header = replace_str(s->header_info,sub_far_ident,tmp);
++
++    return 0;
 +}
 +/*- End of function --------------------------------------------------------*/
 +
  static int make_header(t4_tx_state_t *s)
  {
      time_t now;
-@@ -2439,6 +2472,8 @@
+@@ -2439,6 +2475,8 @@
  
  SPAN_DECLARE(int) t4_tx_start_page(t4_tx_state_t *s)
  {
@@ -64,7 +74,7 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
      span_log(&s->logging, SPAN_LOG_FLOW, "Start tx page %d - compression %s\n", s->current_page, t4_compression_to_str(s->metadata.compression));
      if (s->current_page > s->stop_page)
          return -1;
-@@ -2494,9 +2529,15 @@
+@@ -2494,9 +2532,15 @@
          break;
      }
  
