@@ -1,0 +1,26 @@
+diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/t30.c spandsp-fs/src/t30.c
+--- spandsp-base-fs/src/t30.c	2014-04-22 15:13:32.789027441 +0100
++++ spandsp-fs/src/t30.c	2014-04-22 15:48:44.779682000 +0100
+@@ -3655,9 +3655,13 @@
+     case T30_COPY_QUALITY_PERFECT:
+     case T30_COPY_QUALITY_GOOD:
+         rx_end_page(s);
++        if (s->phase_d_handler)
++            s->phase_d_handler(s, s->phase_d_user_data, fcf);
+         break;
+     case T30_COPY_QUALITY_POOR:
+         rx_end_page(s);
++        if (s->phase_d_handler)
++            s->phase_d_handler(s, s->phase_d_user_data, fcf);
+         break;
+     case T30_COPY_QUALITY_BAD:
+         /* Some people want to keep even the bad pages */
+@@ -3666,8 +3670,6 @@
+         break;
+     }
+ 
+-    if (s->phase_d_handler)
+-        s->phase_d_handler(s, s->phase_d_user_data, fcf);
+     if (fcf == T30_EOP)
+         terminate_operation_in_progress(s);
+     else
