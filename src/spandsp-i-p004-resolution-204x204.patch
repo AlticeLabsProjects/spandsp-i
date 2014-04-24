@@ -1,0 +1,12 @@
+diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/t4_tx.c spandsp-fs/src/t4_tx.c
+--- spandsp-base-fs/src/t4_tx.c	2014-04-23 14:41:16.237527358 +0100
++++ spandsp-fs/src/t4_tx.c	2014-04-23 14:43:18.285277206 +0100
+@@ -137,7 +137,7 @@
+     {                    0, 0,                     0,  T4_RESOLUTION_R8_STANDARD,                     0,                     0,                           0,                      0,                       0}, /* y = 3.85/mm */
+     {T4_RESOLUTION_100_100, 0, T4_RESOLUTION_200_100,                          0,                     0,                     0,                           0,                      0,                       0}, /* y = 100 */
+     {                    0, 0,                     0,      T4_RESOLUTION_R8_FINE,                     0,                     0,                           0,                      0,                       0}, /* y = 7.7/mm */
+-    {                    0, 0, T4_RESOLUTION_200_200,                          0,                     0,                     0,                           0,                      0,                       0}, /* y = 200 */
++    {                    0, 0, T4_RESOLUTION_200_200,      T4_RESOLUTION_R8_FINE,                     0,                     0,                           0,                      0,                       0}, /* y = 200 */
+     {                    0, 0,                     0,                          0, T4_RESOLUTION_300_300,                     0,                           0,                      0,                       0}, /* y = 300 */
+     {                    0, 0,                     0, T4_RESOLUTION_R8_SUPERFINE,                     0,                     0, T4_RESOLUTION_R16_SUPERFINE,                      0,                       0}, /* y = 154/mm */
+     {                    0, 0, T4_RESOLUTION_200_400,                          0,                     0, T4_RESOLUTION_400_400,                           0,                      0,                       0}, /* y = 400 */
