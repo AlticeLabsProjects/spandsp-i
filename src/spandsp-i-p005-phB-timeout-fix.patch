@@ -1,0 +1,23 @@
+diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/t38_terminal.c spandsp-fs/src/t38_terminal.c
+--- spandsp-base-fs/src/t38_terminal.c	2014-04-24 14:02:18.485027485 +0100
++++ spandsp-fs/src/t38_terminal.c	2014-04-24 16:12:45.667512000 +0100
+@@ -1456,7 +1456,8 @@
+     s->rx_signal_present = false;
+     s->timed_step = T38_TIMED_STEP_NONE;
+     //s->iaf = T30_IAF_MODE_T37 | T30_IAF_MODE_T38;
+-    s->iaf = T30_IAF_MODE_T38;
++    //s->iaf = T30_IAF_MODE_T38;
++    s->iaf = 0;
+ 
+     s->current_tx_data_type = T38_DATA_NONE;
+     s->next_tx_samples = 0;
+@@ -1488,7 +1489,8 @@
+     s->timed_step = T38_TIMED_STEP_NONE;
+     s->queued_timed_step = T38_TIMED_STEP_NONE;
+     //s->iaf = T30_IAF_MODE_T37 | T30_IAF_MODE_T38;
+-    s->iaf = T30_IAF_MODE_T38;
++    //s->iaf = T30_IAF_MODE_T38;
++    s->iaf = 0;
+ 
+     s->current_tx_data_type = T38_DATA_NONE;
+     s->next_tx_samples = 0;
