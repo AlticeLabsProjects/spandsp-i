@@ -1,6 +1,6 @@
 diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/spandsp/t30.h spandsp-fs/src/spandsp/t30.h
---- spandsp-base-fs/src/spandsp/t30.h	2014-04-22 17:25:21.608777532 +0100
-+++ spandsp-fs/src/spandsp/t30.h	2014-04-22 17:25:52.868777031 +0100
+--- spandsp-base-fs/src/spandsp/t30.h	2014-04-23 11:15:32.729527380 +0100
++++ spandsp-fs/src/spandsp/t30.h	2014-04-23 11:16:06.332777166 +0100
 @@ -143,7 +143,9 @@
  /*! The maximum length of the body of an ident string */
  #define T30_MAX_IDENT_LEN           20
@@ -13,8 +13,8 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
  typedef struct t30_state_s t30_state_t;
  
 diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/t4_tx.c spandsp-fs/src/t4_tx.c
---- spandsp-base-fs/src/t4_tx.c	2014-04-22 17:25:21.913277458 +0100
-+++ spandsp-fs/src/t4_tx.c	2014-04-22 18:01:10.217277423 +0100
+--- spandsp-base-fs/src/t4_tx.c	2014-04-23 11:15:33.233277498 +0100
++++ spandsp-fs/src/t4_tx.c	2014-04-23 11:17:10.392778359 +0100
 @@ -67,6 +67,7 @@
  #include "spandsp/t43.h"
  #include "spandsp/t4_t6_decode.h"
@@ -23,7 +23,7 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
  
  #include "spandsp/private/logging.h"
  #include "spandsp/private/t81_t82_arith_coding.h"
-@@ -1425,6 +1426,41 @@
+@@ -1425,6 +1426,49 @@
  }
  /*- End of function --------------------------------------------------------*/
  
@@ -58,6 +58,14 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
 +    snprintf(tmp,sizeof(tmp),"%s",(s->local_ident)  ?  s->local_ident  :  "");
 +    s->header_info = replace_str(s->header_info,sub_far_ident,tmp);
 +
++    if (s->header_text == NULL)
++    {
++        if ((s->header_text = span_alloc(T30_MAX_PAGE_HEADER_INFO + 1)) == NULL)
++            return -1;
++    }
++
++    strncpy(s->header_text, s->header_info, strlen(s->header_text));
++
 +    return 0;
 +}
 +/*- End of function --------------------------------------------------------*/
@@ -65,7 +73,7 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
  static int make_header(t4_tx_state_t *s)
  {
      time_t now;
-@@ -2439,6 +2475,8 @@
+@@ -2439,6 +2483,8 @@
  
  SPAN_DECLARE(int) t4_tx_start_page(t4_tx_state_t *s)
  {
@@ -74,7 +82,7 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
      span_log(&s->logging, SPAN_LOG_FLOW, "Start tx page %d - compression %s\n", s->current_page, t4_compression_to_str(s->metadata.compression));
      if (s->current_page > s->stop_page)
          return -1;
-@@ -2494,9 +2532,15 @@
+@@ -2494,9 +2540,15 @@
          break;
      }
  
