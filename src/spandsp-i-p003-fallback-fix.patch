@@ -1,0 +1,54 @@
+diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/t30.c spandsp-fs/src/t30.c
+--- spandsp-base-fs/src/t30.c	2014-04-23 09:02:42.056777379 +0100
++++ spandsp-fs/src/t30.c	2014-04-23 09:06:59.825277383 +0100
+@@ -3112,27 +3112,13 @@
+     }
+     if (++s->ppr_count >= PPR_LIMIT_BEFORE_CTC_OR_EOR)
+     {
+-        /* Continue to correct? */
+-        /* Continue only if we have been making progress */
++        /* Always continue to correct */
+         s->ppr_count = 0;
+-        if (s->ecm_progress)
+-        {
+-            s->ecm_progress = 0;
+-            queue_phase(s, T30_PHASE_D_TX);
+-            set_state(s, T30_STATE_IV_CTC);
+-            send_simple_frame(s, T30_CTC);
+-        }
+-        else
+-        {
+-            set_state(s, T30_STATE_IV_EOR);
+-            queue_phase(s, T30_PHASE_D_TX);
+-            frame[0] = ADDRESS_FIELD;
+-            frame[1] = CONTROL_FIELD_FINAL_FRAME;
+-            frame[2] = (uint8_t) (T30_EOR | s->dis_received);
+-            frame[3] = (s->ecm_at_page_end)  ?  ((uint8_t) (s->next_tx_step | s->dis_received))  :  T30_NULL;
+-            span_log(&s->logging, SPAN_LOG_FLOW, "Sending EOR + %s\n", t30_frametype(frame[3]));
+-            send_frame(s, frame, 4);
+-        }
++        
++        s->ecm_progress = 0;
++        queue_phase(s, T30_PHASE_D_TX);
++        set_state(s, T30_STATE_IV_CTC);
++        send_simple_frame(s, T30_CTC);
+     }
+     else
+     {
+@@ -4704,6 +4690,16 @@
+         /* Valid response to a CTC received */
+         /* T.30 says we change back to long training here */
+         s->short_train = false;
++
++        if (step_fallback_entry(s) < 0)
++        {
++            /* We have fallen back as far as we can go. Give up. */
++            s->current_fallback = 0;
++            s->current_status = T30_ERR_CANNOT_TRAIN;
++            send_dcn(s);
++            break;
++        }
++
+         /* Initiate resending of the remainder of the frames. */
+         set_state(s, T30_STATE_IV);
+         queue_phase(s, T30_PHASE_C_ECM_TX);
