@@ -1,6 +1,6 @@
 diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/spandsp/t30.h spandsp-fs/src/spandsp/t30.h
---- spandsp-base-fs/src/spandsp/t30.h	2014-05-29 13:21:44.345527424 +0100
-+++ spandsp-fs/src/spandsp/t30.h	2014-05-29 13:25:27.644777437 +0100
+--- spandsp-base-fs/src/spandsp/t30.h	2014-05-29 13:37:33.000000000 +0100
++++ spandsp-fs/src/spandsp/t30.h	2015-07-24 11:58:31.319673569 +0100
 @@ -143,7 +143,9 @@
  /*! The maximum length of the body of an ident string */
  #define T30_MAX_IDENT_LEN           20
@@ -13,8 +13,8 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
  typedef struct t30_state_s t30_state_t;
  
 diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject -Naur spandsp-base-fs/src/t4_tx.c spandsp-fs/src/t4_tx.c
---- spandsp-base-fs/src/t4_tx.c	2014-05-29 13:21:45.944777669 +0100
-+++ spandsp-fs/src/t4_tx.c	2014-05-29 13:28:19.904777377 +0100
+--- spandsp-base-fs/src/t4_tx.c	2014-05-29 13:37:33.000000000 +0100
++++ spandsp-fs/src/t4_tx.c	2015-07-24 12:00:02.092423551 +0100
 @@ -67,6 +67,7 @@
  #include "spandsp/t43.h"
  #include "spandsp/t4_t6_decode.h"
@@ -52,12 +52,6 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
 +    const char *sub_far_ident = "%R";
 +    char tmp[20];
 +
-+    snprintf(tmp,sizeof(tmp),"%d",s->current_page+1);
-+    s->header_info = replace_str(s->header_info,sub_page,tmp);
-+
-+    snprintf(tmp,sizeof(tmp),"%s",(s->local_ident)  ?  s->local_ident  :  "");
-+    s->header_info = replace_str(s->header_info,sub_far_ident,tmp);
-+
 +    if (s->header_text == NULL)
 +    {
 +        if ((s->header_text = span_alloc(T30_MAX_PAGE_HEADER_INFO + 1)) == NULL)
@@ -65,6 +59,12 @@ diff --exclude='*.xml' --exclude='*.o.d' --exclude=.project --exclude=.cproject 
 +    }
 +
 +    snprintf(s->header_text, T30_MAX_PAGE_HEADER_INFO, "%s", s->header_info);
++
++    snprintf(tmp,sizeof(tmp),"%d",s->current_page+1);
++    s->header_text = replace_str(s->header_text,sub_page,tmp);
++
++    snprintf(tmp,sizeof(tmp),"%s",(s->local_ident)  ?  s->local_ident  :  "");
++    s->header_text = replace_str(s->header_text,sub_far_ident,tmp);
 +
 +    return 0;
 +}
